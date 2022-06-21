@@ -4,6 +4,8 @@ use crate::{chunk, encoder};
 use io::Write;
 use std::{borrow::Cow, convert::TryFrom, fmt, io};
 
+pub static ONE_INCH_IN_MM: f64 = 25.4;
+
 /// Describes how a pixel is encoded.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]

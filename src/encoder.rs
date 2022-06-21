@@ -9,9 +9,10 @@ use deflate::write::ZlibEncoder;
 use crate::chunk::{self, ChunkType};
 use crate::common::{
     AnimationControl, BitDepth, BlendOp, BytesPerPixel, ColorType, Compression, DisposeOp,
-    FrameControl, Info, ParameterError, ParameterErrorKind, ScaledFloat,
+    FrameControl, Info, ParameterError, ParameterErrorKind, ScaledFloat, PixelDimensions, Unit
 };
 use crate::filter::{filter, AdaptiveFilterType, FilterType};
+use crate::ONE_INCH_IN_MM;
 use crate::text_metadata::{
     EncodableTextChunk, ITXtChunk, TEXtChunk, TextEncodingError, ZTXtChunk,
 };
@@ -368,6 +369,11 @@ impl<'a, W: Write> Encoder<'a, W> {
         } else {
             Err(EncodingError::Format(FormatErrorKind::NotAnimated.into()))
         }
+    }
+
+    pub fn set_dpi(&mut self, dpi: u32) {
+        let ppu = (dpi as f64 * 1000.0 / ONE_INCH_IN_MM).floor() as u32;
+        self.info.pixel_dims = Some(PixelDimensions { xppu: ppu, yppu: ppu, unit: Unit::Meter });
     }
 
     /// Set the dispose operation for every frame.
