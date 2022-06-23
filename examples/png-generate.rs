@@ -8,13 +8,14 @@ use std::io::BufWriter;
 fn main() {
     let path = env::args()
         .nth(1)
-        .expect("Expected a filename to output to.");
+        .unwrap_or("sample.png".to_string());
     let file = File::create(path).unwrap();
     let ref mut w = BufWriter::new(file);
 
     let mut encoder = png::Encoder::new(w, 2, 1); // Width is 2 pixels and height is 1.
     encoder.set_color(png::ColorType::Rgba);
     encoder.set_depth(png::BitDepth::Eight);
+    encoder.set_dpi(300);
     // Adding text chunks to the header
     encoder
         .add_text_chunk(

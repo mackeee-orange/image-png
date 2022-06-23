@@ -505,6 +505,14 @@ pub struct Info<'a> {
     pub utf8_text: Vec<ITXtChunk>,
 }
 
+fn transform_u32_to_array_of_u8(x:u32) -> [u8;4] {
+    let b1 : u8 = ((x >> 24) & 0xff) as u8;
+    let b2 : u8 = ((x >> 16) & 0xff) as u8;
+    let b3 : u8 = ((x >> 8) & 0xff) as u8;
+    let b4 : u8 = (x & 0xff) as u8;
+    return [b1, b2, b3, b4]
+}
+
 impl Default for Info<'_> {
     fn default() -> Info<'static> {
         Info {
@@ -636,6 +644,12 @@ impl Info<'_> {
 
         if let Some(t) = &self.trns {
             encoder::write_chunk(&mut w, chunk::tRNS, t)?;
+        }
+
+        if let Some(pixel_dims) = self.pixel_dims {
+            let _xppu = pixel_dims.xppu.to_be_bytes();
+            let _yppu = pixel_dims.yppu.to_be_bytes();
+            encoder::write_chunk(&mut w, chunk::pHYs, &[_xppu[0], _xppu[1], _xppu[2], _xppu[3], _yppu[0], _yppu[1], _yppu[2], _yppu[3], pixel_dims.unit as u8])?;
         }
 
         // If specified, the sRGB information overrides the source gamma and chromaticities.
